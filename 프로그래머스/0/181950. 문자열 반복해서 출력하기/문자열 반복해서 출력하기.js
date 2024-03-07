@@ -12,6 +12,10 @@ rl.on('line', function (line) {
     str = input[0];
     n = Number(input[1]);
     
-    let answer = [...new Array(n)].map((_, i) => str).join('')
+    // 첫번째 문제풀이
+    // let answer = [...new Array(n)].map((_, i) => str).join('')
+    
+    // 두번째 문제풀이
+    let answer = str.repeat(n)
     console.log(answer)
 });
