@@ -1,0 +1,6 @@
+const fs = require('fs')
+const [a, b, c] = fs.readFileSync('/dev/stdin').toString().split(' ')
+const A = parseInt(a)
+const B = parseInt(b)
+const C = parseInt(c)
+console.log(A + B + C)
