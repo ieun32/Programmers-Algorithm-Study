@@ -1,16 +1,10 @@
-const input = require('fs').readFileSync('/dev/stdin').toString().trim().split('\n');
+const fs = require('fs').readFileSync('/dev/stdin')
+const [n, ...input] = fs.toString().trim().split('\n')
+let answer ='';
 
-const N = input.shift();
-const coords = input.map((coord) => coord.split(' ').map(Number))
-
-coords.sort((a,b) => {
-    if(a[1] === b[1]) return a[0] - b[0];
-    return a[1]-b[1];
+const coordi = input.map((v, i) => v.split(' ').map(Number))
+const result = coordi.sort((a, b) => a[1] === b[1] ? a[0] - b[0] : a[1] - b[1]).forEach((v, i) =>{
+answer += `${v[0]} ${v[1]}\n`
 })
 
-let answer = '';
-coords.forEach((coord) => {
-    answer += coord[0] + ' ' + coord[1] + '\n'
-})
-
-console.log(answer);
+console.log(answer)
