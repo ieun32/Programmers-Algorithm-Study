@@ -1,24 +1,18 @@
-const fs = require('fs')
-const input = fs.readFileSync('/dev/stdin')
-const num = parseInt(input)
-
-let numer;
-let denom;
-let i;
-let count = 1;
-
-for(i = 1; i < num; i = i + count){
-    count++;
+let fs = require("fs");
+let input = fs.readFileSync("/dev/stdin").toString().trim();
+let number = Number(input);
+let value = 1;
+while (true) {
+	number -= value;
+	if (number <= 0) {
+		number += value;
+		break;
+	}
+	value++;
 }
 
-if(count % 2 === 0){
-  numer = Array.from({ length: count }, (_, i) => i + 1)
-  denom = Array.from({ length: count }, (_, i) => i + 1).reverse()
+if (value % 2 === 1) {
+	console.log(`${value - (number - 1)}/${1 + (number - 1)}`);
 } else {
-  numer = Array.from({ length: count }, (_, i) => i + 1).reverse()
-  denom = Array.from({ length: count }, (_, i) => i + 1)
+	console.log(`${1 + (number - 1)}/${value - (number - 1)}`);
 }
-
-const index = num - (i - count) - 1
-
-console.log(`${numer[index]}/${denom[index]}`)
