@@ -1,16 +1,17 @@
-const fs = require('fs').readFileSync('/dev/stdin')
-const [num, ...input] = fs.toString().trim().split('\n')
+let fs = require("fs");
+let input = fs.readFileSync("/dev/stdin")
+	.toString()
+	.split("\n")
+	.map((el) => el.split(" "));
+input.shift();
 
-let obj = {};
-input.map((v, i)=>{
-    arr = v.split(' ')
-    obj[arr[0]] = arr[1];
-})
+let company = new Map(input.map((el) => [el[0], el[1]]));
+let result = [];
 
-let answer = [];
-for(const v in obj){
-    if(obj[v] === 'enter') answer.push(v)
+for (let key of company.keys()) {
+	if (company.get(key) !== "leave") result.push(key);
 }
 
-answer.sort((a, b) => a > b ? -1 : 1);
-console.log(answer.join('\n'))
+result.sort().reverse();
+
+console.log(result.join('\n'));
