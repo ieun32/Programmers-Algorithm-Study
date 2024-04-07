@@ -1,30 +1,35 @@
-const fs = require('fs').readFileSync('/dev/stdin')
-const [testcase, ...input] = fs.toString().trim().split('\n')
-let answer = [];
+const fs = require('fs');
+const file = process.platform === 'linux' ? '/dev/stdin' : './input.txt';
+const input = fs.readFileSync(file).toString().trim().split('\n');
 
-for (let i = 0; i < parseInt(testcase) * 2; i += 2) {
+let [n, ...arr] = input;
+arr = arr.map((item) => item.split(' ').map(Number));
+let answer = '';
+
+for (let i = 0; i < arr.length; i += 2) {
   let count = 0;
-  const [length, num] = input[i].split(' ').map(Number)
-  let weight = input[i + 1].split(' ').map(Number)
-  let queue = Array.from({ length: length }, (_, i) => i)
-  const target = queue[num]
+  const priorities = arr[i + 1];
+  let location = arr[i][1];
 
   while (true) {
-        if(Math.max(...weight) === weight[0]){
-          count++;
-          weight.shift()
-          let printed = queue.shift()
-
-          if(printed === target){
-            break;
-          }
-        } else {
-          weight.push(weight.shift())
-          queue.push(queue.shift())
-        }
+    const max = Math.max(...priorities);
+    const number = priorities.shift();
+    if (number === max) {
+      count++;
+      if (location === 0) {
+        answer += count + '\n';
+        break;
       }
-
-      answer.push(count)
+    } else {
+      priorities.push(number);
     }
 
-console.log(answer.join(' '))
+    if (location === 0) {
+      location = priorities.length - 1;
+    } else {
+      location--;
+    }
+  }
+}
+
+console.log(answer.trim());
