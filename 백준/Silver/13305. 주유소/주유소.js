@@ -12,8 +12,6 @@ while (true) {
   if (index === 0) {
     count += min * weights.reduce((p, c) => p + c)
     break;
-  } else if (index === prices.length - 1){
-    continue;
   } else {
     count += min * weights.splice(index, weights.length).reduce((p,c) => p + c)
     prices = prices.splice(0, index)
