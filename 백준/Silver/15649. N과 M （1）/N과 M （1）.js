@@ -1,19 +1,34 @@
 const fs = require('fs').readFileSync('/dev/stdin')
-let [N, M] = fs.toString().trim().split(' ').map(Number)
+let [n, m] = fs.toString().trim().split(' ').map(Number)
 
-let answer = Array.from({ length: N }, (_, i) => i + 1)
-while(M > 1){
-    let update = [];
-    for(let i = 1; i <= answer.length; i++){
-        for(let j = 1; j <= N; j++){
-            if(!answer[i - 1].toString().includes(j)){
-                update.push(`${answer[i - 1]} ${j}`)
+function solution(n,m) {
+    const seq = [...Array(m)].fill(0);
+    const visited = [...Array(n)].fill(false);
+    let result = "";
+    
+    function dfs(k) {
+        if (k === m) {
+            const arr = [];
+            for (let i=0; i<m; i++) {
+                arr.push(seq[i]);
+            }
+            
+            result += `${arr.join(' ')}\n`;
+            return 
+        }
+        for (let i=1; i<=n; i++) {
+            if (!visited[i]) {
+                seq[k] = i;
+                visited[i] = true;
+                dfs(k+1);
+                visited[i] = false;
             }
         }
     }
-    answer = [...update];
-    M--;
+    
+    dfs(0);
+    return result;
 }
 
-console.log(answer.join('\n'))
+console.log(solution(n,m));
 
