@@ -9,29 +9,28 @@ input.map((v) => {
   graph[j] = graph[j].concat([i])
 })
 
-let queue = [x]
-let visited = [];
+let stack = []
+let visited = Array(+n + 1).fill(false);
 let count = 0;
 
-while (true) {
-  let length = queue.length
-  if (length === 0) {
-    console.log(-1)
-    break;
+function DFS(node) {
+  visited[node] = true;
+  stack.push(node)
+  if (node === y) {
+    console.log(count)
+    return
   }
-  for (let i = 0; i < length; i++) {
-    const shifted = queue.shift()
-    visited.push(shifted)
-    if (shifted === y) {
-      console.log(count)
-      return;
+  graph[node].map((v) => {
+    if (!visited[v]) {
+      count++;
+      DFS(v)
+      count--;
     }
-    graph[shifted].map((v, i) => {
-      if (!visited.includes(v)) {
-        queue.push(v)
-      }
-    })
-  }
-  count++;
+  })
+}
+
+DFS(x)
+if(!stack.includes(y)){
+  console.log(-1)
 }
 
