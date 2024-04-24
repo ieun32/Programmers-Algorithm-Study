@@ -1,29 +1,30 @@
-const input = require("fs").readFileSync("/dev/stdin").toString().split("\n");
-var [N, H] = input.shift().split(" ").map(Number);
-var Trees = input.shift().split(" ").map(Number);
-var MaxH = Math.max(...Trees);
+const input = require('fs').readFileSync('/dev/stdin').toString().trim().split('\n');
 
-function binarySearch(H, Trees, min, max) {
-  let mid = 0;
-  let BestH = 0;
-  
-  while (min <= max) {
-    let SumWood = 0;
-    mid = Math.floor((min + max) / 2);
-    Trees.forEach((a) => {
-      let rest = a - mid;
-      if (rest > 0) SumWood += rest;
-    });
-    if (SumWood >= H) {
-      if (mid > BestH) BestH = mid;
-      min = mid + 1;
-    } 
-    else {
-      max = mid - 1;
+const [N, M] = input.shift().split(' ');
+const trees = input[0].split(' ').map(Number).sort((a,b) => a-b);
+
+function solve(arr, target) {
+    let start = 0;
+    let end = arr[arr.length-1];
+    let answer = Number.MIN_SAFE_INTEGER;
+    while(start <= end) {
+        let mid = Math.floor((start + end)/2);
+        let sum = 0;
+        for(let x of arr) {
+            if(x > mid) sum += x-mid;
+        }
+
+        if(sum >= target) {
+            if(mid > answer) answer = mid; 
+            // 최댓값 계속 구해주기.
+          	// 이 부분을 제외하고는 일반적인 이분탐색 코드와 똑같다.
+            start = mid + 1;
+        } else {
+            end = mid - 1;
+        }
     }
-  }
-  return BestH;
+
+    return answer;
 }
 
-const answer = binarySearch(H, Trees, 0, MaxH);
-console.log(answer);
+console.log(solve(trees, M))
