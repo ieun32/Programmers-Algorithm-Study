@@ -1,44 +1,58 @@
-const input = require('fs').readFileSync('/dev/stdin').toString().trim().split('\n');
-const [N, M, V] = input.shift().split(' ').map(Number);
-const edges = input.map(v => v.split(' ').map(Number));
-const graph = [...Array(N + 1)].map(() => []);
-edges.forEach(([from, to]) => {
-  graph[from].push(to);
-  graph[to].push(from);
-});
+const fs = require('fs').readFileSync('/dev/stdin');
+const [NMV, ...input] = fs.toString().trim().split('\n');
+const [N, M, V] = NMV.split(' ').map(Number);
+INPUT = input.map((v) => v.split(' ').map(Number));
 
-const dfs = (start) => {
-  const stack = [start];
-  const visited = Array(N + 1).fill(false);
-  const order = [];
-  while (stack.length) {
-    const node = stack.pop();
-    if (!visited[node]) {
-      visited[node] = true;
-      order.push(node);
-      stack.push(...graph[node]);
+const graph = Array.from({ length: N + 1}, () => [])
+for(let i = 0; i < INPUT.length; i++){
+    const v1 = INPUT[i][0];
+    const v2 = INPUT[i][1];
+    graph[v1].push(v2);
+    graph[v2].push(v1);
+}
+
+graph.map((v) => v.sort((a, b) => a - b));
+
+const visited = Array.from({ length: N + 1 }, () => false);
+const answer_dfs = [];
+
+function DFS(num){
+    visited[num] = true;
+    answer_dfs.push(num)
+
+    for(const cur of graph[num]){
+        if(!visited[cur]){
+            DFS(cur)
+        }
     }
-  }
-  return order.join(' ');
-};
+}
 
-const bfs = (start) => {
-  const queue = [start];
-  const visited = Array(N + 1).fill(false);
-  const order = [];
-  while (queue.length) {
-    const node = queue.shift();
-    if (!visited[node]) {
-      visited[node] = true;
-      order.push(node);
-      queue.push(...graph[node]);
+let answer_bfs = [];
+
+function BFS(num){
+    let queue = [num];
+    let visited = Array.from({ length: N + 1 }, () => false)
+    
+    while(true){
+        if(queue.length === 0){
+            return 
+        }
+        
+        const cur = queue.shift()
+        visited[cur] = true;
+        answer_bfs.push(cur);
+        
+        for(const v of graph[cur]){
+            if(!visited[v]){
+                queue.push(v)
+                visited[v] = true;
+            }
+        }
+        
     }
-  }
-  return order.join(' ');
-};
+}
 
-graph.forEach(v => v.sort((a, b) => b - a));
-console.log(dfs(V));
-
-graph.forEach(v => v.sort((a, b) => a - b));
-console.log(bfs(V));
+DFS(V)
+BFS(V)
+console.log(answer_dfs.join(' '))
+console.log(answer_bfs.join(' '))
