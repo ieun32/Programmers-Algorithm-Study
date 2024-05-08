@@ -1,17 +1,18 @@
-const fs = require("fs");
-const filePath = process.platform === "linux" ? "/dev/stdin" : "./input.txt";
-let input = fs.readFileSync(filePath).toString().trim().split("\n");
+const fs = require("fs").readFileSync("/dev/stdin");
+const [M, N] = fs.toString().trim().split(" ").map(Number);
 
-const [M, N] = input[0].split(" ").map((item) => +item);
-
-function isPrime(num) {
-  if (num === 1) return;
-  for (let j = 2; j <= Math.sqrt(num); j++) {
-    if (num % j === 0) return;
+function getPrimes(M, N) {
+  const isPrime = new Array(N + 1).fill(true);
+  isPrime[0] = false;
+  isPrime[1] = false;
+  for (let i = 2; i <= Math.sqrt(N); i++) {
+    if (isPrime[i]) {
+      for (let j = i * i; j <= N; j += i) {
+        isPrime[j] = false;
+      }
+    }
   }
-  return console.log(num);
+  return isPrime.map((value, index) => value ? index : null).filter((value) => value && value >= M)
 }
 
-for (let i = M; i <= N; i++) {
-  isPrime(i);
-}
+console.log(getPrimes(M, N).join("\n"))
