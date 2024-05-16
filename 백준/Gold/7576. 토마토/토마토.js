@@ -1,113 +1,53 @@
-const fs = require('fs');
-const [table, ...arr] = fs.readFileSync("/dev/stdin").toString().trim().split("\n");
-const [C,R] = table.split(' ').map(v=>+v);
-let tomato = arr.map(v=>v.split(' ').map(w=>+w));
-tomato.unshift(new Array(C).fill(-1))
-tomato.push(new Array(C).fill(-1))
-tomato.forEach((_,i)=>{
-  tomato[i].unshift(-1);
-  tomato[i].push(-1);
-})
-class Node{
-  constructor(item){
-    this.item = item;
-    this.next = null;
-  }
+const input = require('fs').readFileSync('/dev/stdin').toString().split('\n').map(s => s.split(" ")).slice(0,-1);
+const NM = input.shift();
+const [n,m] = NM.map(el => Number(el));
+const board = input.map(s => s.map(el => Number(el)));
+
+const dx=[1, 0, -1, 0];
+const dy=[0, 1, 0, -1];
+
+function solution(row,col,board) {
+    const q = [];
+    const dist = [...Array(col)].map(() => Array(row).fill(0));
+    for (let i=0; i < col; i++) {
+        for (let j=0; j < row; j++) {
+            // 익은 토마토일 시 queue에 넣어 주변 익지않은 토마토 탐색
+            if (board[i][j] === 1) {
+                q.push([i,j]);
+            }
+            // 익지 않은 토마토일 시
+            if (board[i][j] === 0) {
+                dist[i][j] = -1;
+            }
+        }
+    }
+    let head = 0;
+    // 익은토마토만 q에 있음
+    while (q.length > head) {
+        const [x,y] = q[head++];
+        for (let k=0; k<4; k++) {
+            const nx = x + dx[k];
+            const ny = y + dy[k];
+            if (nx < 0 || ny < 0 || nx >= col || ny >= row) continue;
+            // 익은 토마토 / 빈칸일시 넘어가기
+            if (dist[nx][ny] >= 0) continue;
+            // 익지않은 토마토에 대해 +1
+            dist[nx][ny] = dist[x][y] + 1;
+            // 주변 토마토 탐색
+            q.push([nx,ny]);
+        }
+    }
+    
+    // 토마토가 익을 때까지의 최소 날짜 출력
+    let day = 0;
+    for (let i=0; i < col; i++) {
+        for (let j=0; j < row; j++) {
+            // 익지 않은 토마토가 있음
+            if (dist[i][j] === -1) return -1;
+            day = Math.max(day, dist[i][j]);
+        }
+    }
+    return day;
 }
 
-class Queue{
-  constructor(){
-    this.head = null;
-    this.tail = null;
-    this.length = 0;
-  }
-
-  push(item){
-    const node = new Node(item)
-    if(this.head==null){
-      this.head= node;
-    }else{
-      this.tail.next = node;
-    }
-
-    this.tail = node;
-    this.length +=1;
-  }
-
-  pop(){
-    const popItem = this.head;
-    this.head = this.head.next;
-    this.length -=1;
-    return popItem.item;
-  }
-
-  size(){
-    return this.length;
-  }
-
-  empty(){
-    if(this.length==0){
-      return 1;
-    }else{
-      return 0;
-    }
-  }
-
-  front(){
-    if(this.empty()==1) return -1;
-    return this.head.item; 
-  }
-
-  back(){
-    if(this.empty()==1) return -1;
-    return this.tail.item; 
-  }
-}
-
-let q = new Queue();
-let unripe = 0; 
-let days = 0; 
-tomato.forEach((v,y)=>{
-  v.forEach((v2,x)=>{
-    if(v2==1){
-      q.push([y,x,0]);
-    }
-    if(v2==0){
-      unripe++;
-    }
-  })
-})
-while(!q.empty()){
-
-
-  let [y,x,c] = q.pop();
-  if(c>days) days = c;
-
-  if(tomato[y-1][x]==0){
-    tomato[y-1][x]=1;
-    q.push([y-1,x,c+1])
-    unripe--;
-  }
-  if(tomato[y+1][x]==0){
-    tomato[y+1][x]=1;
-    q.push([y+1,x,c+1])
-    unripe--;
-  }
-  if(tomato[y][x-1]==0){
-    tomato[y][x-1]=1;
-    q.push([y,x-1,c+1])
-    unripe--;
-  }
-  if(tomato[y][x+1]==0){
-    tomato[y][x+1]=1;
-    q.push([y,x+1,c+1])
-    unripe--;
-  }
-}
-
-
-if(unripe!=0){
-  console.log(-1);
-}else{
-  console.log(days)
-}
+console.log(solution(n,m,board));
