@@ -1,61 +1,48 @@
-const fs = require('fs');
+const fs = require("fs").readFileSync("/dev/stdin");
+const [N, M] = fs.toString().trim().split("\n").map(Number);
 
-let input = fs.readFileSync('/dev/stdin').toString().trim().split('\n');
-const n = parseInt(input[0]);
-const k = parseInt(input[1]);
+// N * N 이차원 배열 0으로 초기화
+const snail = Array.from({ length: N }, () => new Array(N).fill(0));
+// 아래, 오른쪽, 위쪽, 왼쪽 순으로 벽까지 혹은 0이 아닐때까지 이동
+// 좌표부터 만들기
+const dx = [1, 0, -1, 0];
+const dy = [0, 1, 0, -1];
+let answer = [];
 
-let dr = [1, 0, -1, 0]; // 하, 우, 상, 좌
-let dc = [0, 1, 0, -1];
-let map = new Array(n).fill().map(() => new Array(n).fill(0));
+// 달팽이 수 채우는 함수
+function makeSnail(N, target){
+    let index = 0;
+    let num = N * N;
+    let [x, y] = [0, 0];
 
-function makeMap() {
-    let r = 0;
-    let c = 0;
-    let count = n * n;
-    let d = 0; // 방향
+    while(true){
+        // 수를 채운다
+        snail[x][y] = num;
 
-    while (true) {
-        if (count === 0) {
-            break;
+        // num이 타겟과 같으면 위치를 저장한다.
+        if(num === target){
+            answer = [x + 1, y + 1];
         }
-        map[r][c] = count--;
-        let nr = r + dr[d];
-        let nc = c + dc[d];
-        let nd = setDirection(d, nr, nc);
-        // 방향이 바뀌면 다음 방향을 기준으로 r,c를 업데이트.
-        if (nd !== d) {
-            r = r + dr[nd];
-            c = c + dc[nd];
-            d = nd;
-        } else {
-            r = nr;
-            c = nc;
+        
+        // num이 1이면 끝까지 채운 것이므로 종료한다
+        if(num === 1){
+            return
         }
+        
+        // 이동할 좌표 구하기
+        const i = index % 4;
+        let [X, Y] = [x + dx[i], y + dy[i]];
+        // 범위에 벗어나는 지 확인한다, 벗어나면 dx, dy를 한 칸 옮기기
+        if(X < 0 || Y < 0 || X >= N || Y >= N || snail[X][Y] !== 0){
+            index++
+            const i = index % 4;
+            [X, Y] = [x + dx[i], y + dy[i]]
+        }
+        [x, y] = [X, Y];
+        num--;
     }
 }
-
-function setDirection(d, nr, nc) {
-    // 범위를 벗어났거나 이후 있을 자리에 이미 값이 있거나
-    if (nr >= n || nc >= n || nr < 0 || nc < 0 || map[nr][nc] !== 0) {
-        d = (d + 1) % 4;
-    }
-    return d;
-}
-
-makeMap();
-
-for (let i = 0; i < map.length; i++) {
-    console.log(map[i].join(' '));
-}
-
-let kr, kc;
-for (let i = 0; i < map.length; i++) {
-    for (let j = 0; j < map.length; j++) {
-        if (map[i][j] === k) {
-            kr = i + 1;
-            kc = j + 1;
-            break;
-        }
-    }
-}
-console.log(kr, kc);
+makeSnail(N, M)
+const print = snail.map((row) => row.join(" "))
+console.log(print.join("\n"))
+console.log(answer.join(" "))
