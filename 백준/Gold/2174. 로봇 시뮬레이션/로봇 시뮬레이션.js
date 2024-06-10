@@ -1,73 +1,68 @@
 const input = require("fs").readFileSync("/dev/stdin").toString().trim().split("\n");
-const [A, B] = input.shift().split(" ").map(Number);
-const [N, M] = input.shift().split(" ").map(Number);
-const ground = Array.from({ length: B }, () => new Array(A).fill(0))
+const [A, B] = input.shift().split(" ").map(Number); // A가로 B세로
+const [N, M] = input.shift().split(" ").map(Number); // N로봇 M명령
 
-// 방향 정보: 상(N), 우(E), 하(S), 좌(W)
-const dx = [0, 1, 0, -1];
-const dy = [1, 0, -1, 0];
-const getDirection = Object.freeze({
+// 방향 정보 문자열 매칭
+const direction = {
   N: 0,
   E: 1,
   S: 2,
   W: 3
-})
+}
+// 방향 정보 초기화 N > E > S > W
+const dx = [0, 1, 0, -1];
+const dy = [1, 0, -1, 0];
 
-// 로봇 좌표와 방향 정보 초기화
-const robots = new Array(N + 1)
-for (let i = 0; i < N; i++) {
-  const [x, y, d] = input[i].trim().split(" ");
-  ground[y - 1][x - 1] = i + 1;
-  robots[i + 1] = [x - 1, y - 1, getDirection[d]];
+// 위치 정보 초기화
+// 위치 (x: 가로, y: 세로, d: 방향)
+const location = [0];
+const map = Array.from({ length: B + 1 }, () => Array(A + 1).fill(0));
+for (let i = 1; i <= N; i++) {
+  const [x, y, d] = input.shift().trim().split(" ");
+  location.push([+x, +y, direction[d]]); // i번 로봇의 위치 정보 저장 (1부터)
+  map[+y][+x] = i;
 }
 
-// 명령 개수만큼 명령 수행
-let isCreashed = false;
-for (let i = 0; i < M; i++) {
-  let [robotNum, cmd, repeat] = input[N + i].trim().split(" ");
-  const result = executeCommand(robotNum, cmd, repeat);
-  if (result === -1) {
-    isCreashed = true;
-    return
-  }
-}
+// 명령 수행
+// 명령 (n: 로봇, m: 명령, r: 반복)
+function work() {
+  let isSuccess = true;
+  for (let i = 0; i < M; i++) {
+    const [n, m, r] = input.shift().trim().split(" ");
+    const repeat = Number(r);
 
-if (!isCreashed) {
-  console.log("OK")
-}
-
-// 명령별로 방향을 바꾸거나 이동하는 함수
-function executeCommand(robotNum, cmd, repeat) {
-  while (repeat > 0) {
-    let x, y, d;
-    switch (cmd) {
-      case 'L':
-        [x, y, d] = robots[robotNum];
-        d === 0 ? d = 3 : d = d - 1;
-        robots[robotNum] = [x, y, d];
-        break;
-      case 'R':
-        [x, y, d] = robots[robotNum];
-        d === 3 ? d = 0 : d = d + 1;
-        robots[robotNum] = [x, y, d];
-        break;
-      case 'F':
-        [x, y, d] = robots[robotNum];
-        const [X, Y] = [+x + dx[d], +y + dy[d]];
-        if (X < 0 || Y < 0 || X >= A || Y >= B) {
-          console.log(`Robot ${robotNum} crashes into the wall`);
-          return -1
-        }
-        if (ground[Y][X] !== 0) {
-          console.log(`Robot ${robotNum} crashes into robot ${ground[Y][X]}`);
-          return -1
-        }
-        ground[+y][+x] = 0;
-        ground[Y][X] = +robotNum;
-        robots[robotNum] = [X, Y, +d];
-        break;
+    // 명령 r만큼 반복 수행
+    for (let j = 0; j < repeat; j++) {
+      let [x, y, d] = location[+n];
+      switch (m) {
+        case "R":
+          location[+n] = [x, y, (d + 1) % 4];
+          break;
+        case "L":
+          location[+n] = [x, y, (d + 3) % 4];
+          break;
+        case "F":
+          const [X, Y] = [x + dx[d], y + dy[d]];
+          if (X < 1 || Y < 1 || X > A || Y > B) {
+            console.log(`Robot ${n} crashes into the wall`);
+            isSuccess = false;
+            return;
+          } else if (map[Y][X] !== 0) {
+            console.log(`Robot ${n} crashes into robot ${map[Y][X]}`);
+            isSuccess = false;
+            return;
+          } else {
+            location[+n] = [X, Y, d];
+            map[y][x] = 0;
+            map[Y][X] = +n;
+          }
+          break;
+      }
     }
-    repeat--;
   }
-  return 1;
+  if (isSuccess) {
+    console.log("OK");
+  }
 }
+
+work();
