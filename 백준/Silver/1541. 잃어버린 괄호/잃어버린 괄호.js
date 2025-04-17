@@ -1,8 +1,15 @@
-const input = require('fs').readFileSync('dev/stdin').toString().trim().split('-');
+const fs = require('fs').readFileSync('/dev/stdin');
+const expression = fs.toString().trim();
 
-function sumValue(arr) {
-  if (!arr.length) return 0;
-  return +arr.split('+').reduce((pre, cur) => +pre + +cur);
-}
+const split_with_minus = expression.split('-');
+let count = 0;
+for(let i = 0; i < split_with_minus.length; i++){
+    const split_with_plus = split_with_minus[i].split('+').map(Number);
+    if(i === 0){
+        count += split_with_plus.reduce((res, acc) => res + acc);
+    } else {
+        count -= split_with_plus.reduce((res, acc) => res + acc);
+    };
+};
 
-console.log(input.reduce((prev, cur) => prev - sumValue(cur), sumValue(input[0]) * 2));
+console.log(count);
