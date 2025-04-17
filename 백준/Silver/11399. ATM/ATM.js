@@ -1,19 +1,13 @@
-const fs = require('fs').readFileSync('/dev/stdin')
-const [n, input] = fs.toString().trim().split('\n')
+const fs = require('fs').readFileSync('/dev/stdin');
+const [N, P] = fs.toString().trim().split("\n");
+// 각 사람이 돈을 인출하는데 필요한 시간, 오름차순 정렬
+const times = P.split(" ").map(Number).sort((a, b) => a - b);
+let cache = times[0];
+let answer = cache;
 
-const num = Number(n)
-
-const p = input.split(' ').map(Number)
-let count = 0;
-let arr = [];
-
-p.sort((a, b) => a - b)
-
-for(let i = 0; i < num; i++){
-    count += p[i]
-    arr.push(count)
+for (let i = 1; i < Number(N); i++) {
+  cache += times[i];
+  answer += cache;
 }
 
-const result = arr.reduce((p, c) => p + c, 0)
-
-console.log(result)
+console.log(answer);
