@@ -29,7 +29,7 @@ function countInsert(arr) {
         } else {
             // 끼어드는 경우
             line.splice(insertIdx, 0, cur);
-            count += (line.length - 1 - insertIdx);
+            count += (line.length - (insertIdx + 1));
         }
     }
 
